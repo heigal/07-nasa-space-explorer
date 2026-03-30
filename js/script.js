@@ -1,7 +1,6 @@
 // Find our date picker inputs on the page
 const startInput = document.getElementById('startDate');
 const endInput = document.getElementById('endDate');
-const apiKeyInput = document.getElementById('apiKey');
 const button = document.querySelector('button');
 const gallery = document.getElementById('gallery');
 const factText = document.getElementById('spaceFactText');
@@ -12,9 +11,8 @@ const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalExplanation = document.getElementById('modalExplanation');
 
-// NASA API key. Users can provide their own to avoid rate limiting.
-// Get API key: https://api.nasa.gov/
-let API_KEY = localStorage.getItem('nasaApiKey') || 'DEMO_KEY';
+// NASA API key for this project.
+const API_KEY = 'nr9N3cg26W1cXyVaelcFmKhdkRwQKutcfGaqVNio';
 const APOD_URL = 'https://api.nasa.gov/planetary/apod';
 const EARLIEST_DATE = '1995-06-16';
 const VIDEO_FALLBACK_IMAGE = 'img/nasa-worm-logo.png';
@@ -34,11 +32,6 @@ const spaceFacts = [
 // - Default to a range of 9 days (from 9 days ago to today)
 // - Restrict dates to NASA's image archive (starting from 1995)
 setupDateInputs(startInput, endInput);
-
-// Load saved API key and restore to input field
-if (apiKeyInput) {
-	apiKeyInput.value = API_KEY === 'DEMO_KEY' ? '' : API_KEY;
-}
 
 function showRandomSpaceFact() {
 	const randomIndex = Math.floor(Math.random() * spaceFacts.length);
@@ -168,15 +161,6 @@ function closeModal() {
 }
 
 async function fetchApodData() {
-	// Allow user to provide their own API key
-	if (apiKeyInput && apiKeyInput.value.trim()) {
-		API_KEY = apiKeyInput.value.trim();
-		localStorage.setItem('nasaApiKey', API_KEY);
-	} else {
-		API_KEY = 'DEMO_KEY';
-		localStorage.removeItem('nasaApiKey');
-	}
-
 	const { startDate, endDate } = getNineDayRange(startInput.value);
 	startInput.value = startDate;
 	endInput.value = endDate;
@@ -189,10 +173,11 @@ async function fetchApodData() {
 		const response = await fetch(url);
 
 		if (!response.ok) {
-		const statusText = response.status === 429 
-			? 'Too many requests (429). Please provide your own NASA API key.' 
-			: `HTTP ${response.status}: Could not fetch APOD data.`;
-		throw new Error(statusText);
+			const statusText = response.status === 429
+				? 'Too many requests (429). Please try again in a bit.'
+				: `HTTP ${response.status}: Could not fetch APOD data.`;
+			throw new Error(statusText);
+		}
 
 		const data = await response.json();
 		renderGallery(data);
@@ -200,7 +185,7 @@ async function fetchApodData() {
 		let errorMsg = 'There was a problem loading APOD data.';
 
 		if (error.message && error.message.includes('429')) {
-			errorMsg = 'Requests are being rate-limited by NASA. Please use your own API key. Get one free at: <strong>https://api.nasa.gov/</strong>';
+			errorMsg = 'Requests are being rate-limited by NASA right now. Please try again in a moment.';
 		}
 
 		gallery.innerHTML = `

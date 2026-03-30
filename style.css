@@ -91,7 +91,6 @@ h1 {
 
 /* Inputs and buttons */
 input[type="date"],
-input[type="text"],
 button {
   font-family: 'Barlow', sans-serif;
   font-weight: normal;
@@ -128,7 +127,6 @@ button:hover {
   }
   
   input[type="date"],
-  input[type="text"],
   button {
     width: auto;
   }
