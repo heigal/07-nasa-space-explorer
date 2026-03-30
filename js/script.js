@@ -15,6 +15,8 @@ const modalExplanation = document.getElementById('modalExplanation');
 const API_KEY = 'DEMO_KEY';
 const APOD_URL = 'https://api.nasa.gov/planetary/apod';
 const EARLIEST_DATE = '1995-06-16';
+// SVG data URI for video placeholder: space-themed play button in NASA colors
+const VIDEO_FALLBACK_IMAGE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="spaceBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%230b3d91;stop-opacity:1"/><stop offset="100%" style="stop-color:%230b0f1a;stop-opacity:1"/></linearGradient></defs><rect width="400" height="300" fill="url(%23spaceBg)"/><circle cx="200" cy="150" r="90" fill="none" stroke="%23fc3d21" stroke-width="4"/><polygon points="165,125 165,175 235,150" fill="%23fc3d21"/><text x="200" y="260" font-family="Arial,sans-serif" font-size="16" fill="%23ffffff" text-anchor="middle">Video Content</text></svg>';
 let galleryItems = [];
 
 const spaceFacts = [
@@ -52,7 +54,20 @@ function getYouTubeEmbedUrl(videoUrl) {
 		return `https://www.youtube.com/embed/${videoId}`;
 	}
 
+	if (videoUrl.includes('youtube.com/shorts/')) {
+		const videoId = videoUrl.split('shorts/')[1].split('?')[0];
+		return `https://www.youtube.com/embed/${videoId}`;
+	}
+
 	return '';
+}
+
+function getCardImageUrl(item) {
+	if (item.media_type === 'image') {
+		return item.url;
+	}
+
+	return item.thumbnail_url || VIDEO_FALLBACK_IMAGE;
 }
 
 // Keep the selected range to exactly 9 consecutive days.
@@ -90,12 +105,12 @@ function renderGallery(items) {
 
 	gallery.innerHTML = galleryItems
 		.map((item, index) => {
-			const imageUrl = item.media_type === 'image' ? item.url : item.thumbnail_url;
+			const imageUrl = getCardImageUrl(item);
 			const mediaLabel = item.media_type === 'video' ? '<p><strong>Video Entry</strong></p>' : '';
 
 			return `
 				<article class="gallery-item" data-index="${index}">
-					<img src="${imageUrl}" alt="${item.title}" data-index="${index}" class="gallery-image" />
+					<img src="${imageUrl}" alt="${item.title}" data-index="${index}" class="gallery-image" onerror="this.onerror=null;this.src='${VIDEO_FALLBACK_IMAGE}';this.style.objectFit='contain';this.style.background='#111';" />
 					${mediaLabel}
 					<p><strong>${item.title}</strong></p>
 					<p>${item.date}</p>
@@ -120,9 +135,9 @@ function openModal(item) {
 				<a class="modal-video-link" href="${item.url}" target="_blank" rel="noopener noreferrer">Open video in a new tab</a>
 			`;
 		} else {
-			const previewImage = item.thumbnail_url || item.url;
+			const previewImage = item.thumbnail_url || VIDEO_FALLBACK_IMAGE;
 			modalMedia.innerHTML = `
-				<img src="${previewImage}" alt="${item.title}" />
+				<img src="${previewImage}" alt="${item.title}" onerror="this.onerror=null;this.src='${VIDEO_FALLBACK_IMAGE}';this.style.objectFit='contain';this.style.background='#111';" />
 				<a class="modal-video-link" href="${item.url}" target="_blank" rel="noopener noreferrer">Open video in a new tab</a>
 			`;
 		}
