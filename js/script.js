@@ -15,8 +15,7 @@ const modalExplanation = document.getElementById('modalExplanation');
 const API_KEY = 'DEMO_KEY';
 const APOD_URL = 'https://api.nasa.gov/planetary/apod';
 const EARLIEST_DATE = '1995-06-16';
-// SVG data URI for video placeholder: space-themed play button in NASA colors
-const VIDEO_FALLBACK_IMAGE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="spaceBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0b3d91;stop-opacity:1"/><stop offset="100%" style="stop-color:#0b0f1a;stop-opacity:1"/></linearGradient></defs><rect width="400" height="300" fill="url(#spaceBg)"/><circle cx="200" cy="150" r="90" fill="none" stroke="#fc3d21" stroke-width="4"/><polygon points="165,125 165,175 235,150" fill="#fc3d21"/><text x="200" y="260" font-family="Arial,sans-serif" font-size="16" fill="#ffffff" text-anchor="middle">Video Content</text></svg>';
+const VIDEO_FALLBACK_IMAGE = 'img/nasa-worm-logo.png';
 let galleryItems = [];
 
 const spaceFacts = [
@@ -110,7 +109,7 @@ function renderGallery(items) {
 
 			return `
 				<article class="gallery-item" data-index="${index}">
-					<img src="${imageUrl}" alt="${item.title}" data-index="${index}" class="gallery-image" onerror="this.onerror=null;this.src='${VIDEO_FALLBACK_IMAGE}';this.style.objectFit='contain';this.style.background='#111';" />
+					<img src="${imageUrl}" alt="${item.title}" data-index="${index}" class="gallery-image" onerror="this.onerror=null;this.src='img/nasa-worm-logo.png';this.style.objectFit='contain';this.style.background='#111';" />
 					${mediaLabel}
 					<p><strong>${item.title}</strong></p>
 					<p>${item.date}</p>
@@ -137,7 +136,7 @@ function openModal(item) {
 		} else {
 			const previewImage = item.thumbnail_url || VIDEO_FALLBACK_IMAGE;
 			modalMedia.innerHTML = `
-				<img src="${previewImage}" alt="${item.title}" onerror="this.onerror=null;this.src='${VIDEO_FALLBACK_IMAGE}';this.style.objectFit='contain';this.style.background='#111';" />
+				<img src="${previewImage}" alt="${item.title}" onerror="this.onerror=null;this.src='img/nasa-worm-logo.png';this.style.objectFit='contain';this.style.background='#111';" />
 				<a class="modal-video-link" href="${item.url}" target="_blank" rel="noopener noreferrer">Open video in a new tab</a>
 			`;
 		}
